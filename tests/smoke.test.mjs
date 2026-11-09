@@ -26,7 +26,7 @@ globalThis.__WAYPOINT_TEST_SDK__={
   buildPath(){},buildLabel(){},Command:{MOVE:0,LINE:1}
 };
 
-await import("../src/extension.mjs");
+await import("../src/extension-v0.1.4.mjs");
 
 async function ready(){
   for(let i=0;i<100;i++){if(actions.length===2)return;await new Promise(resolve=>setTimeout(resolve,5));}
@@ -54,13 +54,13 @@ test("End Movement remains a visible Owlbear tool action",async()=>{
 
 test("manifest points to Pages hosted entry and diagnostic panel",()=>{
   const m=JSON.parse(fs.readFileSync(new URL("../manifest.json",import.meta.url),"utf8"));
-  assert.match(m.background_url,/index\.html\?v=0\.1\.3$/);
+  assert.match(m.background_url,/index-v0\.1\.4\.html$/);
   assert.match(m.action.popover,/diagnostics\.html/);
-  assert.equal(m.version,"0.1.3");
+  assert.equal(m.version,"0.1.4");
 });
 
 test("SDK is vendored locally so no CDN fetch is required",()=>{
-  const code=fs.readFileSync(new URL("../src/extension.mjs",import.meta.url),"utf8");
+  const code=fs.readFileSync(new URL("../src/extension-v0.1.4.mjs",import.meta.url),"utf8");
   const sdk=fs.readFileSync(new URL("../vendor/owlbear-sdk-3.1.0.mjs",import.meta.url),"utf8");
   assert.match(code,/owlbear-sdk-3\.1\.0\.mjs/);
   assert.doesNotMatch(code,/https:\/\/esm/);
