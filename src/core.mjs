@@ -6,6 +6,26 @@ export function snapSquare(position,dpi,corner={x:0,y:0}){
   if(!(dpi>0))return clonePoint(position);
   return {x:corner.x+Math.round((position.x-corner.x)/dpi)*dpi,y:corner.y+Math.round((position.y-corner.y)/dpi)*dpi};
 }
+// Token images are sized in their own source-grid DPI, independent of the scene DPI.
+// Odd footprints align their image origin to cell centers; even footprints to intersections.
+// Do this independently on each axis for rectangular 2x3 or 3x2 tokens.
+export function tokenGridFootprint(item){
+  const dpi=Number(item?.grid?.dpi);
+  const width=Number(item?.image?.width);
+  const height=Number(item?.image?.height);
+  const scaleX=Math.abs(Number(item?.scale?.x??1));
+  const scaleY=Math.abs(Number(item?.scale?.y??1));
+  const cells=(dimension,scale)=>dpi>0&&dimension>0&&scale>0
+    ?Math.max(1,Math.round(dimension*scale/dpi)):1;
+  return {columns:cells(width,scaleX),rows:cells(height,scaleY)};
+}
+export function tokenSnapOrigin(item,corner,center){
+  const {columns,rows}=tokenGridFootprint(item);
+  return {
+    x:columns%2===0?corner.x:center.x,
+    y:rows%2===0?corner.y:center.y
+  };
+}
 export const samePoint=(a,b)=>!!a&&!!b&&Math.abs(a.x-b.x)<EPS&&Math.abs(a.y-b.y)<EPS;
 export function createMovement(tokenId,start,mode=MODES.WAYPOINT){
   const origin=clonePoint(start);
