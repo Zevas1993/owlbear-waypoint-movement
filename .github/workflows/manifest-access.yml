@@ -1,0 +1,31 @@
+name: Manifest Access Diagnostics
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check-manifest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Compare response headers as an Owlbear-origin request
+        shell: bash
+        run: |
+          set -u
+          for url in \
+            'https://zevas1993.github.io/owlbear-waypoint-movement/manifest-v0.1.5.json' \
+            'https://zevas1993.github.io/owlbear-waypoint-movement/manifest-v0.1.6.json' \
+            'https://zevas1993.github.io/owlbear-waypoint-movement/manifest.json' \
+            'https://raw.githubusercontent.com/Zevas1993/owlbear-waypoint-movement/main/manifest-v0.1.6.json'
+          do
+            echo "::group::$url"
+            for origin in 'https://www.owlbear.rodeo' 'https://owlbear.rodeo'
+            do
+              echo "Request origin: $origin"
+              curl --silent --show-error --location --max-time 25 --dump-header /tmp/wm-headers --output /tmp/wm-body --header "Origin: $origin" "$url"
+              grep -iE '^(HTTP/|content-type:|access-control-allow-origin:|access-control-allow-methods:|vary:|content-security-policy:|location:|cache-control:|x-cache:)' /tmp/wm-headers || true
+              echo "JSON first bytes: $(head -c 65 /tmp/wm-body)"
+            done
+            echo "::endgroup::"
+          done
