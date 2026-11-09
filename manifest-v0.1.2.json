@@ -1,0 +1,17 @@
+{
+  "name": "Waypoint Movement",
+  "version": "0.1.2",
+  "manifest_version": 1,
+  "description": "Waypoint and touch-traced movement with cumulative ruler and End Movement button.",
+  "icon": "https://zevas1993.github.io/owlbear-waypoint-movement/assets/route.svg",
+  "background_url": "https://zevas1993.github.io/owlbear-waypoint-movement/index.html?v=0.1.2",
+  "homepage_url": "https://github.com/Zevas1993/owlbear-waypoint-movement",
+  "author": "Zevas1993",
+  "action": {
+    "title": "Waypoint Diagnostics",
+    "icon": "https://zevas1993.github.io/owlbear-waypoint-movement/assets/route.svg",
+    "popover": "https://zevas1993.github.io/owlbear-waypoint-movement/diagnostics.html?v=0.1.2",
+    "width": 360,
+    "height": 320
+  }
+}
