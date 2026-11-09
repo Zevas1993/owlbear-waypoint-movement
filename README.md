@@ -26,16 +26,16 @@ This repository serves static files with no build step.
 
 Releasing a drag commits the position **without resetting the accumulated measurement**. Dragging a different token clears the previous session and starts a new one.
 
-## Grid snapping
+## Free movement (v0.1.5)
 
-The movement tool now honors the **token's grid footprint** on square grids:
-- Small/Medium (1×1): center of the cell.
-- Large (2×2): intersection of the surrounding cells.
-- Huge (3×3): center of the middle cell.
-- Gargantuan (4×4): intersection in the middle of the four center cells.
-- Scaled or rectangular tokens: each dimension is measured using the token image's native grid DPI and scale; e.g., a 2×3 token uses intersection snapping horizontally and center snapping vertically.
+**The tool does not snap the token to grid lines, intersections, or cell centers.** It follows the pointer continuously and preserves the offset between your initial grab point and the token's position. This is deliberate: drag routes can now follow doorways and corners without jumping to a grid lattice.
 
-The extension asks Owlbear for the current scene's center and corner grid positions, preserving map-grid alignment. The token's original position is always preserved as waypoint zero; this fix doesn't silently relocate an existing token until a drag occurs.
+- The token's **original position** remains waypoint zero.
+- A Medium token remains the same size. Large, Huge and other tokens likewise keep their existing dimensions.
+- Waypoint mode measures segments through **E** presses; Trace mode follows sampled pointer movement.
+- Releasing the token records that point without ending the movement turn.
+- **End Movement** on desktop and mobile finishes and clears the cumulative path.
+- A future separate **optional end-of-drag cell-center snap** can be implemented without forcing snaps during movement.
 
 ## Known limitations
 
@@ -43,10 +43,10 @@ The extension asks Owlbear for the current scene's center and corner grid positi
 - Paths are player-local overlays; token movement is synchronized.
 - Tracks the path you draw, not collision/pathfinding against fog walls or doors. Touch tracing reflects sampled positions and cannot recover corners the browser never reports.
 - Owlbear's SDK is self-hosted from the pinned `vendor/owlbear-sdk-3.1.0.mjs`; no third-party runtime CDN is required.
-- The custom desktop movement tool has been confirmed to load and draw a route in an Owlbear room. Size-aware snapping has automated tests, but still needs human verification in that room and on mobile.
+- The custom desktop movement tool has been confirmed to load and draw a route in an Owlbear room. Free-drag positioning and cumulative waypoints have automated tests, but still need human verification in that room and on mobile.
 
 ## Developer notes
 
-Static HTML and ES modules; no npm or build required. `src/core.mjs` contains grid and waypoint math; `src/extension.mjs` registers the Owlbear tool, modes, overlays and actions.
+Static HTML and ES modules; no npm or build required. `src/core-v0.1.5.mjs` contains route math; `src/extension-v0.1.5.mjs` registers the Owlbear tool, modes, overlays and actions. Versioned files prevent caching conflicts.
 
 [Owlbear extension documentation](https://docs.owlbear.rodeo/extensions/) · [GitHub Pages documentation](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)
