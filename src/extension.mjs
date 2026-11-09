@@ -160,7 +160,7 @@ async function register(){
 }
 async function boot(){
   // Load the locally hosted pinned SDK; Owlbear no longer needs a third-party CDN.
-  const sdk=await import("../vendor/owlbear-sdk-3.1.0.mjs");
+  const sdk=globalThis.__WAYPOINT_TEST_SDK__ ?? await import("../vendor/owlbear-sdk-3.1.0.mjs");
   ({default:OBR,buildPath,buildLabel,Command}=sdk);
   if(!OBR.isAvailable){say("Extension files loaded. Install the public manifest in Owlbear to activate.");return;}
   OBR.onReady(()=>{void register().catch(e=>warn("Tool registration failed",e));});
