@@ -55,7 +55,7 @@ test("End Movement remains a visible Owlbear tool action",async()=>{
 test("manifest points to Pages hosted entry and diagnostic panel",()=>{
   const m=JSON.parse(fs.readFileSync(new URL("../manifest.json",import.meta.url),"utf8"));
   assert.match(m.background_url,/index-v0\.1\.5\.html$/);
-  assert.match(m.action.popover,/diagnostics\.html/);
+  assert.match(m.action.popover,/diagnostics-v0\.1\.5\.html$/);
   assert.equal(m.version,"0.1.5");
 });
 
