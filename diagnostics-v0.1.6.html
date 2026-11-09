@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Waypoint Movement Diagnostics</title>
+<style>body{margin:0;padding:16px;color:#e3f7ef;background:#14242a;font:14px system-ui,sans-serif}h2{font-size:17px;margin-top:0}p{line-height:1.5}.status{border:1px solid #4c7568;border-radius:8px;padding:10px;white-space:pre-wrap;background:#0b1d22}small{color:#aecbbf}code{overflow-wrap:anywhere;color:#8ae7bc}</style></head>
+<body><h2>Waypoint Movement · Diagnostics</h2><p>This panel checks whether Owlbear can initialize the extension SDK. The movement tool itself belongs in the <b>right-hand toolbar</b>.</p>
+<div class="status" id="output">Checking…</div>
+<p><small>Extension version 0.1.6. When sending a bug report, include the status text above.</small></p>
+<script type="module">
+const output=document.getElementById("output");
+const lines=[];
+const log=(name,value)=>{lines.push(name+": "+String(value));output.textContent=lines.join("\n");};
+window.addEventListener("error",e=>log("Script error",e.message));
+window.addEventListener("unhandledrejection",e=>log("Promise rejection",e.reason?.message||e.reason));
+try {
+ const {default:OBR}=await import("./vendor/owlbear-sdk-3.1.0.mjs");
+ log("Local SDK loaded","yes");
+ log("Embedded in Owlbear",OBR.isAvailable);
+ if(OBR.isAvailable){
+  OBR.onReady(async()=>{
+   log("SDK ready",OBR.isReady);
+   try{log("Scene ready",await OBR.scene.isReady());}catch(e){log("Scene check failed",e.message);}
+   try{log("Active tool ID",await OBR.tool.getActiveTool());}catch(e){log("Tool query failed",e.message);}
+   log("Background registration","If right toolbar is still missing, copy this text.");
+  });
+ } else {log("Context","This diagnostic must be opened from inside your Owlbear room.");}
+} catch(e) {log("SDK loading failed",e?.stack||e?.message||e);}
+</script>
+</body></html>
