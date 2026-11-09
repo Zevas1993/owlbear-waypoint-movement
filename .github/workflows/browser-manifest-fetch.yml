@@ -40,5 +40,23 @@ jobs:
             },url);
             console.log('BROWSER FETCH',url,JSON.stringify(result));
           }
+          // Also test the real Owlbear site so any page-level CSP restrictions are exercised.
+          const actual = await browser.newPage();
+          actual.on('console', m=>{if(m.type()==='error')console.log('OWLBEAR CONSOLE',m.text());});
+          try {
+            const navigation = await actual.goto('https://www.owlbear.rodeo/',{waitUntil:'domcontentloaded',timeout:18000});
+            console.log('OWLBEAR REAL PAGE',actual.url(),navigation?.status());
+            for (const url of [
+              'https://zevas1993.github.io/owlbear-waypoint-movement/manifest-v0.1.5.json',
+              'https://zevas1993.github.io/owlbear-waypoint-movement/manifest-v0.1.6.json'
+            ]) {
+              const value=await actual.evaluate(async url=>{
+                try{const r=await fetch(url,{cache:'no-store'});return {ok:r.ok,status:r.status,version:(await r.json()).version};}
+                catch(e){return {error:String(e)}}
+              },url);
+              console.log('OWLBEAR REAL-PAGE FETCH',url,JSON.stringify(value));
+            }
+          } catch(e){console.log('OWLBEAR REAL-PAGE TEST UNAVAILABLE',String(e));}
+          await actual.close();
           await browser.close();
           NODE
