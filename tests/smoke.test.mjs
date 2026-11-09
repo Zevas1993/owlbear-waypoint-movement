@@ -68,8 +68,9 @@ test("SDK is vendored locally so no CDN fetch is required",()=>{
   assert.match(sdk,/export\{/);
 });
 
-test("free-drag tool doesn't force snapping or load stale previous-version grid modules",()=>{
+test("native snap tool uses Owlbear grid and an immutable source module",()=>{
   const code=fs.readFileSync(new URL("../src/extension-v0.1.6.mjs",import.meta.url),"utf8");
-  assert.doesNotMatch(code,/snapSquare/);\n  assert.match(code,/OBR\.scene\.grid\.snapPosition\(raw,undefined/);
+  assert.doesNotMatch(code,/snapSquare/);
+  assert.match(code,/OBR\.scene\.grid\.snapPosition\(raw,undefined/);
   assert.match(code,/\.\/core-v0\.1\.6\.mjs/);
 });
