@@ -144,20 +144,23 @@ function mode(id,title,graphic){
 }
 async function register(){
   const touch=window.matchMedia?.("(pointer: coarse)")?.matches??false;
-  await OBR.tool.create({id:TOOL,defaultMode:touch?TRACE:WAYPOINT,defaultMetadata:{[ACTIVE]:false},icons:[{icon:icon("route"),label:"Waypoint Movement"}]});
+  // Register the tool first without referencing a mode that does not yet exist.
+  await OBR.tool.create({id:TOOL,defaultMetadata:{[ACTIVE]:false},icons:[{icon:icon("route"),label:"Waypoint Movement"}]});
+  say("Right-hand movement tool registered; configuring modes…");
   await OBR.tool.createMode(mode(WAYPOINT,"Waypoint Movement · E for corners","route"));
   await OBR.tool.createMode(mode(TRACE,"Trace Movement · follow drag","trace"));
-  await OBR.tool.createAction({id:END,icons:[{icon:icon("end"),label:"End Movement",filter:{activeTools:[TOOL]}}],disabled:{metadata:[{key:[ACTIVE],value:false}]},onClick(){void endMovement();}});
-  await OBR.tool.createAction({id:UNDO,icons:[{icon:icon("undo"),label:"Undo Last Waypoint",filter:{activeTools:[TOOL]}}],disabled:{metadata:[{key:[ACTIVE],value:false}]},onClick(){if(drag&&!drag.ending)enqueue(drag,{type:"undo"});else void undoCommitted();}});
+  await OBR.tool.createAction({id:END,icons:[{icon:icon("end"),label:"End Movement",filter:{activeTools:[TOOL]}}],onClick(){void endMovement();}});
+  await OBR.tool.createAction({id:UNDO,icons:[{icon:icon("undo"),label:"Undo Last Waypoint",filter:{activeTools:[TOOL]}}],onClick(){if(drag&&!drag.ending)enqueue(drag,{type:"undo"});else void undoCommitted();}});
   await active(false);
+  try { await OBR.tool.activateMode(TOOL,touch?TRACE:WAYPOINT); }
+  catch(e) { console.warn("Movement mode not preselected; click a mode in the toolbar.",e); }
   OBR.tool.onToolChange(id=>{if(id!==TOOL)void switchTool();});
   OBR.tool.onToolModeChange(id=>{if((id===WAYPOINT||id===TRACE)&&session&&session.movement.mode!==(id===TRACE?MODES.TRACE:MODES.WAYPOINT))void endMovement();});
   say("Waypoint Movement registered. Select its tool in the Owlbear room.");
 }
 async function boot(){
-  let sdk;
-  try{sdk=await import("https://esm.sh/@owlbear-rodeo/sdk@3.1.0?bundle");}
-  catch(e){console.warn("Primary SDK CDN failed",e);sdk=await import("https://esm.run/@owlbear-rodeo/sdk@3.1.0");}
+  // Load the locally hosted pinned SDK; Owlbear no longer needs a third-party CDN.
+  const sdk=await import("../vendor/owlbear-sdk-3.1.0.mjs");
   ({default:OBR,buildPath,buildLabel,Command}=sdk);
   if(!OBR.isAvailable){say("Extension files loaded. Install the public manifest in Owlbear to activate.");return;}
   OBR.onReady(()=>{void register().catch(e=>warn("Tool registration failed",e));});
