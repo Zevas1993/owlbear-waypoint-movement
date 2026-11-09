@@ -1,0 +1,44 @@
+name: Owlbear-Origin Browser Fetch
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  chromium-manifest-fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save playwright-core@1.56.1
+      - name: Compare browser CORS fetch from Owlbear origin
+        run: |
+          node --input-type=module <<'NODE'
+          import { chromium } from 'playwright-core';
+          const executablePath = '/usr/bin/google-chrome';
+          const browser = await chromium.launch({headless: true, executablePath, args:['--no-sandbox']});
+          const page = await browser.newPage();
+          page.on('console', m=>console.log('PAGE CONSOLE',m.type(),m.text()));
+          page.on('requestfailed', req=>console.log('REQUEST FAILURE',req.url(),req.failure()?.errorText));
+          await page.route('https://www.owlbear.rodeo/__manifest_browser_test__', r=>r.fulfill({status:200,contentType:'text/html',body:'<!doctype html><title>Origin test</title>'}));
+          await page.goto('https://www.owlbear.rodeo/__manifest_browser_test__');
+          for(const url of [
+            'https://zevas1993.github.io/owlbear-waypoint-movement/manifest-v0.1.5.json',
+            'https://zevas1993.github.io/owlbear-waypoint-movement/manifest-v0.1.6.json',
+            'https://zevas1993.github.io/owlbear-waypoint-movement/manifest.json',
+            'https://raw.githubusercontent.com/Zevas1993/owlbear-waypoint-movement/main/manifest-v0.1.6.json',
+          ]){
+            const result=await page.evaluate(async u=>{
+              try {
+                const res=await fetch(u,{cache:'no-store',mode:'cors'});
+                const str=await res.text();
+                return {ok:res.ok,status:res.status,type:res.type,ctype:res.headers.get('content-type'),length:str.length,version:JSON.parse(str).version};
+              } catch(err){return {error:String(err)}}
+            },url);
+            console.log('BROWSER FETCH',url,JSON.stringify(result));
+          }
+          await browser.close();
+          NODE
