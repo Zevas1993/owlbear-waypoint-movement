@@ -1,0 +1,17 @@
+{
+  "name": "Waypoint Movement",
+  "version": "0.1.3",
+  "manifest_version": 1,
+  "description": "Size-aware center snapping, waypoint and touch-traced movement, cumulative ruler and End Movement.",
+  "icon": "https://zevas1993.github.io/owlbear-waypoint-movement/assets/route.svg",
+  "background_url": "https://zevas1993.github.io/owlbear-waypoint-movement/index.html?v=0.1.3",
+  "homepage_url": "https://github.com/Zevas1993/owlbear-waypoint-movement",
+  "author": "Zevas1993",
+  "action": {
+    "title": "Waypoint Diagnostics",
+    "icon": "https://zevas1993.github.io/owlbear-waypoint-movement/assets/route.svg",
+    "popover": "https://zevas1993.github.io/owlbear-waypoint-movement/diagnostics.html?v=0.1.3",
+    "width": 360,
+    "height": 320
+  }
+}
