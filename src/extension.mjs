@@ -1,4 +1,4 @@
-import {MODES,clonePoint,createMovement,finishDrag,formatDistance,measureDistance,moveCursor,pinWaypoint,restoreMovement,rewindCommittedSegment,routePoints,saveMovement,snapSquare,undoWaypoint} from "./core.mjs";
+import {MODES,clonePoint,createMovement,finishDrag,formatDistance,measureDistance,moveCursor,pinWaypoint,restoreMovement,rewindCommittedSegment,routePoints,saveMovement,snapSquare,tokenSnapOrigin,undoWaypoint} from "./core.mjs";
 
 const ROOT="com.routecraft.waypoint-movement",TOOL=ROOT+"/tool",WAYPOINT=ROOT+"/waypoint",TRACE=ROOT+"/trace",END=ROOT+"/end",UNDO=ROOT+"/undo",ACTIVE=ROOT+"/active";
 const icon=name=>new URL("../assets/"+name+".svg",import.meta.url).href;
@@ -48,7 +48,7 @@ function process(d){
     while(d.queue.length&&!d.cancelled&&drag===d){
       const op=d.queue.shift();
       if(op.type==="move"){
-        const point=snapSquare({x:op.pointer.x+d.offset.x,y:op.pointer.y+d.offset.y},d.session.dpi,d.session.corner);
+        const point=snapSquare({x:op.pointer.x+d.offset.x,y:op.pointer.y+d.offset.y},d.session.dpi,d.snapOrigin);
         moveCursor(d.session.movement,point);
         if(d.interaction)d.interaction[0](item=>{item.position=clonePoint(point)});
         refresh(d.session);
@@ -96,7 +96,7 @@ async function switchTool(){if(drag)await cancelDrag(drag);await endMovement();}
 function startDrag(context,event){
   const item=event.target;
   if(!item||item.layer!=="CHARACTER"||item.locked||event.transformer||drag)return;
-  const d={tokenId:item.id,mode:chosen(context),queue:[],ready:false,processing:null,interaction:null,cancelled:false,ending:false,begin:null,session:null,previous:null,offset:null};
+  const d={tokenId:item.id,mode:chosen(context),queue:[],ready:false,processing:null,interaction:null,cancelled:false,ending:false,begin:null,session:null,previous:null,offset:null,snapOrigin:null};
   drag=d;
   d.begin=(async()=>{
     if(closing)await closing;
@@ -106,12 +106,21 @@ function startDrag(context,event){
     if(session&&session.movement.tokenId!==item.id)await clear();
     if(drag!==d||d.cancelled)return;
     if(!session){
-      const [dpi,rule,scale,corner]=await Promise.all([OBR.scene.grid.getDpi(),OBR.scene.grid.getMeasurement(),OBR.scene.grid.getScale(),OBR.scene.grid.snapPosition({x:0,y:0},1,true,false)]);
-      session={movement:createMovement(item.id,item.position,d.mode),dpi,rule,scale:scale.parsed,corner,pathId:null,labelId:null,painting:null,dirty:false,disposed:false};
+      const [dpi,rule,scale,corner,center]=await Promise.all([
+        OBR.scene.grid.getDpi(),
+        OBR.scene.grid.getMeasurement(),
+        OBR.scene.grid.getScale(),
+        OBR.scene.grid.snapPosition({x:0,y:0},1,true,false),
+        OBR.scene.grid.snapPosition({x:0,y:0},1,false,true)
+      ]);
+      session={movement:createMovement(item.id,item.position,d.mode),dpi,rule,scale:scale.parsed,corner,center,pathId:null,labelId:null,painting:null,dirty:false,disposed:false};
       await overlay(session);await active(true);
     }
     if(drag!==d||d.cancelled)return;
     d.session=session;d.previous=saveMovement(session.movement);
+    // Respect the token's own footprint: 1x1/3x3 snap to centers, 2x2/4x4 to corners.
+    // Supports rectangular footprints by determining each axis independently.
+    d.snapOrigin=tokenSnapOrigin(item,session.corner,session.center);
     d.offset={x:session.movement.cursor.x-event.pointerPosition.x,y:session.movement.cursor.y-event.pointerPosition.y};
     d.interaction=await OBR.interaction.startItemInteraction(item);
     if(drag!==d||d.cancelled){try{d.interaction[1]();}catch{}return;}
