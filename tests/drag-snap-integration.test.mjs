@@ -97,6 +97,8 @@ async function drag(item,destination){
   m.onToolDragMove({activeMode:WAYPOINT},{pointerPosition:destination});
   m.onToolDragEnd({activeMode:WAYPOINT},{pointerPosition:destination});
   await until(()=>item.position.x!==(current.x) || item.position.y!==(current.y),"token movement commit");
+  // Wait for the drag-end callback to finish releasing its interaction before another grab.
+  await new Promise(resolve=>setTimeout(resolve,0));
 }
 async function end(){
   const end=actions.find(a=>a.id.endsWith("/end"));
