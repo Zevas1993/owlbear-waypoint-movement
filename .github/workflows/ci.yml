@@ -1,0 +1,23 @@
+name: Waypoint Movement Checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  static-and-registration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check JavaScript modules
+        run: |
+          node --check src/core.mjs
+          node --check src/extension.mjs
+          node --check vendor/owlbear-sdk-3.1.0.mjs
+      - name: Verify toolbar and controls
+        run: node --test tests/smoke.test.mjs
