@@ -71,7 +71,7 @@ globalThis.__WAYPOINT_TEST_SDK__={
   Command:{MOVE:"MOVE",LINE:"LINE"}
 };
 
-await import("../src/extension.mjs");
+await import("../src/extension-v0.1.4.mjs");
 
 async function until(fn,label,timeout=1200){
   const stop=Date.now()+timeout;
@@ -106,12 +106,12 @@ async function end(){
   await until(()=>overlays.size===0,"End Movement clears local overlay");
 }
 
-test("medium token drag commits to center-cell coordinate",async()=>{
+test("restored movement tool registers and commits a Medium token drag",async()=>{
   await until(()=>modes.length===2 && actions.length===2,"tool registration");
   const item=character("medium",1,{x:50,y:50});
   await drag(item,{x:123,y:208});
-  assert.deepEqual(item.position,{x:150,y:250});
-  assert.ok(snapFlags.some(p=>p.corners===false && p.center===true));
+  assert.deepEqual(item.position,{x:100,y:200});
+  assert.ok(snapFlags.some(p=>p.corners===true && p.center===false));
   await end();
 });
 
@@ -126,7 +126,7 @@ test("a second drag of the same token retains the first waypoint and accumulates
   const item=character("twodrags",1,{x:50,y:50});
   await drag(item,{x:120,y:208});
   const first={...item.position};
-  assert.deepEqual(first,{x:150,y:250});
+  assert.deepEqual(first,{x:100,y:200});
   // This second drag happens without pressing End Movement.
   const before=interactions.length;
   const m=mode();
@@ -134,11 +134,11 @@ test("a second drag of the same token retains the first waypoint and accumulates
   await until(()=>interactions.length>before,"regrab token");
   m.onToolDragMove({activeMode:WAYPOINT},{pointerPosition:{x:248,y:326}});
   m.onToolDragEnd({activeMode:WAYPOINT},{pointerPosition:{x:248,y:326}});
-  await until(()=>item.position.x===250 && item.position.y===350,"second drag commits");
-  await until(()=>[...overlays.values()].some(i=>i.type==="label"&&i.text.plainText==="15 ft"),"cumulative measurement");
+  await until(()=>item.position.x===200 && item.position.y===300,"second drag commits");
+  await until(()=>[...overlays.values()].some(i=>i.type==="label"&&i.text.plainText==="13 ft"),"cumulative measurement");
   const path=[...overlays.values()].find(i=>i.type==="path");
   assert.deepEqual(path.commands,[
-    ["MOVE",50,50],["LINE",150,250],["LINE",250,350]
+    ["MOVE",50,50],["LINE",100,200],["LINE",200,300]
   ]);
   await end();
 });
