@@ -240,3 +240,28 @@ test("mobile Trace regrab keeps shared line and End Movement removes it globally
   await end();
   assert.equal(ownItems().length,0);
 });
+
+test("switching tools during an unfinished drag cancels and clears global rulers",async()=>{
+  activeTool=TOOL;
+  const t=token("mid-drag-switch",50,50);
+  const m=movementMode();
+  const startCount=interactionStarts.length;
+  m.onToolDragStart({activeMode:WAYPOINT},{target:t,pointerPosition:{...t.position}});
+  await until(()=>interactionStarts.length>startCount && ownItems().length===2,"mid-drag shared ruler start");
+  m.onToolDragMove({activeMode:WAYPOINT},{pointerPosition:{x:145,y:50}});
+  activeTool="rodeo.owlbear.tool/measure";
+  toolChanged(activeTool);
+  await until(()=>ownItems().length===0,"tool switch cancels global mid-drag path",2500);
+  activeTool=TOOL;
+});
+test("End Movement button also clears a live global path during an unfinished drag",async()=>{
+  activeTool=TOOL;
+  const t=token("mid-drag-end",50,50);
+  const m=movementMode();
+  const startCount=interactionStarts.length;
+  m.onToolDragStart({activeMode:WAYPOINT},{target:t,pointerPosition:{...t.position}});
+  await until(()=>interactionStarts.length>startCount && ownItems().length===2,"live ruler started");
+  m.onToolDragMove({activeMode:WAYPOINT},{pointerPosition:{x:145,y:50}});
+  actions.find(a=>a.id.endsWith("/end")).onClick();
+  await until(()=>ownItems().length===0,"End Movement clears shared live route",2500);
+});
