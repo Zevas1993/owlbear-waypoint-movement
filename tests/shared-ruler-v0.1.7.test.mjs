@@ -77,6 +77,9 @@ globalThis.__WAYPOINT_TEST_SDK__={
   },
   buildPath:()=>builder("path"),buildLabel:()=>builder("label"),Command:{MOVE:"MOVE",LINE:"LINE"}
 };
+// Simulate a player returning after a browser crash while another player has a route.
+overlays.set("abandoned-self",{id:"abandoned-self",layer:"RULER",metadata:{[OWNER]:"test-player"},type:"path"});
+overlays.set("live-other",{id:"live-other",layer:"RULER",metadata:{[OWNER]:"other-player"},type:"path"});
 await import("../src/extension-v0.1.7.mjs");
 async function until(fn,description,timeout=1400){
   const deadline=Date.now()+timeout;
@@ -109,6 +112,12 @@ async function end(){
   actions.find(a=>a.id.endsWith("/end")).onClick();
   await until(()=>ownItems().length===0,"End Movement cleanup");
 }
+test("reload removes abandoned shared paths belonging only to this player",async()=>{
+  await until(()=>modes.length===2&&actions.length===2,"toolbar ready");
+  await until(()=>!overlays.has("abandoned-self"),"abandoned player route cleanup");
+  assert.ok(overlays.has("live-other"),"another player's active route must not be removed");
+  overlays.delete("live-other");
+});
 test("toolbar and End Movement remain registered in version 0.1.7",async()=>{
   await until(()=>modes.length===2&&actions.length===2,"toolbar registration");
   assert.equal(tools.length,1);
