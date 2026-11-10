@@ -89,7 +89,7 @@ test("all players share the active path and tool switching is watched",()=>{
 
 test("long-route renderer bounds shared geometry and renews long token drags",()=>{
   const code=fs.readFileSync(new URL("../src/extension-v0.1.9.mjs",import.meta.url),"utf8");
-  const renderer=fs.readFileSync(new URL("../src/route-visual-v0.1.9.mjs",import.meta.url),"utf8");
+  const renderer=fs.readFileSync(new URL("../src/route-visual-v0.1.8.mjs",import.meta.url),"utf8");
   assert.match(code,/visibleRoute\(routePoints/);
   assert.match(code,/MIN_UPDATE_INTERVAL_MS/);
   assert.match(code,/renewTokenInteraction/);
