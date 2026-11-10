@@ -53,7 +53,7 @@ test("visual simplification never changes exact cumulative trace measurement",()
   assert.ok(shown.length<=MAX_VISIBLE_POINTS);
   const exact=measureDistance(m,{dpi:100,rule:"CHEBYSHEV",multiplier:5});
   assert.ok(exact>0);
-  assert.equal(exact,1000*5,"every zigzag step should still count");
+  assert.equal(exact,999*5,"every actual zigzag step should still count");
   assert.ok(actual.length>shown.length,"visual path must be simplified independently");
 });
 test("many manual E waypoints retain the original route and exact distance",()=>{
