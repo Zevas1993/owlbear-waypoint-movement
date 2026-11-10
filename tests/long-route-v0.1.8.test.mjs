@@ -291,7 +291,11 @@ test("a 450-turn Trace session stays responsive, caps shared path geometry and c
   const finalPointer={x:450,y:350};
   m.onToolDragEnd({activeMode:TRACE},{pointerPosition:finalPointer});
   await until(()=>t.position.x===450&&t.position.y===350,"final position after angled path",7000);
-  await until(()=>ownItems().some(item=>item.type==="path"&&item.commands?.length>2),"shared route after stress",5000);
+  await until(()=>ownItems().some(item=>{
+    if(item.type!=="path"||!item.commands?.length)return false;
+    const point=item.commands.at(-1);
+    return point[1]===450 && point[2]===350;
+  }),"shared path catches up to final position after throttling",5000);
   const path=ownItems().find(item=>item.type==="path");
   assert.ok(path.commands.length<=144, "visible path must be bounded");
   assert.deepEqual(path.commands[0].slice(1),[50,50]);
