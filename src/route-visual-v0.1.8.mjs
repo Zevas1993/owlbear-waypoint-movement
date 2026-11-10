@@ -31,7 +31,9 @@ function rdpIndices(points,toleranceSquared){
 const same=(a,b)=>Math.abs(a.x-b.x)<SAME&&Math.abs(a.y-b.y)<SAME;
 export const MAX_VISIBLE_POINTS=144;
 export const MIN_UPDATE_INTERVAL_MS=100;
-export const MAX_TRACE_QUEUE=96;
+// Preserve hundreds of genuine turns under normal use; only trim an exceptionally
+// overloaded asynchronous input backlog.
+export const MAX_TRACE_QUEUE=512;
 export function visibleRoute(points,limit=MAX_VISIBLE_POINTS){
   const result=[];
   for(const p of points){
