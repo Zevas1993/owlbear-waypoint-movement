@@ -55,8 +55,8 @@ test("End Movement remains a visible Owlbear tool action",async()=>{
 
 test("manifest points to Pages hosted entry and diagnostic panel",()=>{
   const m=JSON.parse(fs.readFileSync(new URL("../manifest.json",import.meta.url),"utf8"));
-  assert.match(m.background_url,/index-v0\.1\.6\.html$/);
-  assert.match(m.action.popover,/diagnostics-v0\.1\.6\.html$/);
+  assert.match(m.background_url,/index-v0\.1\.7\.html$/);
+  assert.match(m.action.popover,/diagnostics-v0\.1\.7\.html$/);
   assert.equal(m.version,"0.1.7");
 });
 
@@ -73,7 +73,7 @@ test("native snap tool uses Owlbear grid and an immutable source module",()=>{
   const code=fs.readFileSync(new URL("../src/extension-v0.1.7.mjs",import.meta.url),"utf8");
   assert.doesNotMatch(code,/snapSquare/);
   assert.match(code,/OBR\.scene\.grid\.snapPosition\(raw,undefined/);
-  assert.match(code,/\.\/core-v0\.1\.6\.mjs/);
+  assert.match(code,/\.\/core-v0\.1\.7\.mjs/);
 });
 
 test("all players share the active path and tool switching is watched",()=>{
