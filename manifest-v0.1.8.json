@@ -1,0 +1,17 @@
+{
+  "name": "Waypoint Movement",
+  "version": "0.1.8",
+  "manifest_version": 1,
+  "description": "Stable long angled routes: bounded shared line, original token snapping, and live movement tracking for all players.",
+  "icon": "https://zevas1993.github.io/owlbear-waypoint-movement/assets/route.svg",
+  "background_url": "https://zevas1993.github.io/owlbear-waypoint-movement/index-v0.1.8.html",
+  "homepage_url": "https://github.com/Zevas1993/owlbear-waypoint-movement",
+  "author": "Zevas1993",
+  "action": {
+    "title": "Waypoint Diagnostics",
+    "icon": "https://zevas1993.github.io/owlbear-waypoint-movement/assets/route.svg",
+    "popover": "https://zevas1993.github.io/owlbear-waypoint-movement/diagnostics-v0.1.8.html",
+    "width": 360,
+    "height": 320
+  }
+}

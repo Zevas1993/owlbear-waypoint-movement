@@ -27,7 +27,7 @@ globalThis.__WAYPOINT_TEST_SDK__={
   buildPath(){},buildLabel(){},Command:{MOVE:0,LINE:1}
 };
 
-await import("../src/extension-v0.1.7.mjs");
+await import("../src/extension-v0.1.8.mjs");
 
 async function ready(){
   for(let i=0;i<100;i++){if(actions.length===2)return;await new Promise(resolve=>setTimeout(resolve,5));}
@@ -55,13 +55,13 @@ test("End Movement remains a visible Owlbear tool action",async()=>{
 
 test("manifest points to Pages hosted entry and diagnostic panel",()=>{
   const m=JSON.parse(fs.readFileSync(new URL("../manifest.json",import.meta.url),"utf8"));
-  assert.match(m.background_url,/index-v0\.1\.7\.html$/);
-  assert.match(m.action.popover,/diagnostics-v0\.1\.7\.html$/);
-  assert.equal(m.version,"0.1.7");
+  assert.match(m.background_url,/index-v0\.1\.8\.html$/);
+  assert.match(m.action.popover,/diagnostics-v0\.1\.8\.html$/);
+  assert.equal(m.version,"0.1.8");
 });
 
 test("SDK is vendored locally so no CDN fetch is required",()=>{
-  const code=fs.readFileSync(new URL("../src/extension-v0.1.7.mjs",import.meta.url),"utf8");
+  const code=fs.readFileSync(new URL("../src/extension-v0.1.8.mjs",import.meta.url),"utf8");
   const sdk=fs.readFileSync(new URL("../vendor/owlbear-sdk-3.1.0.mjs",import.meta.url),"utf8");
   assert.match(code,/owlbear-sdk-3\.1\.0\.mjs/);
   assert.doesNotMatch(code,/https:\/\/esm/);
@@ -70,18 +70,27 @@ test("SDK is vendored locally so no CDN fetch is required",()=>{
 });
 
 test("native snap tool uses Owlbear grid and an immutable source module",()=>{
-  const code=fs.readFileSync(new URL("../src/extension-v0.1.7.mjs",import.meta.url),"utf8");
+  const code=fs.readFileSync(new URL("../src/extension-v0.1.8.mjs",import.meta.url),"utf8");
   assert.doesNotMatch(code,/snapSquare/);
   assert.match(code,/OBR\.scene\.grid\.snapPosition\(raw,undefined/);
-  assert.match(code,/\.\/core-v0\.1\.7\.mjs/);
+  assert.match(code,/\.\/core-v0\.1\.8\.mjs/);
 });
 
 test("all players share the active path and tool switching is watched",()=>{
-  const code=fs.readFileSync(new URL("../src/extension-v0.1.7.mjs",import.meta.url),"utf8");
+  const code=fs.readFileSync(new URL("../src/extension-v0.1.8.mjs",import.meta.url),"utf8");
   assert.match(code,/OBR\.scene\.items\.addItems\(/);
   assert.match(code,/OBR\.scene\.items\.updateItems\(/);
   assert.match(code,/OBR\.scene\.items\.deleteItems\(/);
   assert.doesNotMatch(code,/OBR\.scene\.local\./);
   assert.match(code,/OBR\.tool\.onToolChange\(/);
   assert.match(code,/OBR\.tool\.getActiveTool\(/);
+});
+
+test("long-route renderer bounds shared geometry and renews long token drags",()=>{
+  const code=fs.readFileSync(new URL("../src/extension-v0.1.8.mjs",import.meta.url),"utf8");
+  const renderer=fs.readFileSync(new URL("../src/route-visual-v0.1.8.mjs",import.meta.url),"utf8");
+  assert.match(code,/visibleRoute\(routePoints/);
+  assert.match(code,/MIN_UPDATE_INTERVAL_MS/);
+  assert.match(code,/renewTokenInteraction/);
+  assert.match(renderer,/MAX_VISIBLE_POINTS=144/);
 });

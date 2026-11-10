@@ -55,6 +55,18 @@ Important: A character left off-grid by 0.1.5 will initially select the nearest 
 
 The new modules `src/extension-v0.1.6.mjs` and `src/core-v0.1.6.mjs` are independent of older releases so Owlbear cannot mix a new module with a cached old one.
 
+## Long, complex routes (v0.1.8)
+
+This release protects against network overload when a movement path has many corners.
+
+- The shared **visual line is simplified to at most 144 points**. This does not remove waypoints from the underlying route or change the distance measured from processed positions.
+- Shared path/label updates are limited to approximately **10 times per second** (one in flight), rather than every pointer event.
+- Trace mode buffers up to **512 pending moves**; beyond this extreme input backlog, it preferentially drops low-significance pending points. Manual E waypoints are preserved. Distances reflect all positions that were processed.
+- Live token movement interactions are renewed after approximately **22 seconds** to avoid Owlbear's documented 30-second expiration.
+- The existing per-token center/corner snapping, shared view for other players, End Movement button, tool-switch cleanup, and mobile continuation are unchanged.
+
+The visual line may be slightly less detailed after very long zigzags, while the measured distance retains the actual processed movement segments.
+
 ## Known limitations
 
 - Square grid only.
@@ -65,6 +77,6 @@ The new modules `src/extension-v0.1.6.mjs` and `src/core-v0.1.6.mjs` are indepen
 
 ## Developer notes
 
-Static HTML and ES modules; no npm or build required. `src/core-v0.1.7.mjs` contains route math and snap-lattice detection; `src/extension-v0.1.7.mjs` registers the tool, native snapping, shared global overlay and actions. Older versioned files are retained for rollback.
+Static HTML and ES modules; no npm or build required. `src/core-v0.1.8.mjs` preserves route math and grid snapping; `src/route-visual-v0.1.8.mjs` manages bounded geometry; `src/extension-v0.1.8.mjs` registers the tool, shared throttled renderer and interactions. Older versioned files are retained for rollback.
 
 [Owlbear extension documentation](https://docs.owlbear.rodeo/extensions/) · [GitHub Pages documentation](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)
