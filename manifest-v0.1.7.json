@@ -1,0 +1,17 @@
+{
+  "name": "Waypoint Movement",
+  "version": "0.1.7",
+  "manifest_version": 1,
+  "description": "Shared live movement ruler for all players, native token snapping, automatic tool-switch cleanup and End Movement.",
+  "icon": "https://zevas1993.github.io/owlbear-waypoint-movement/assets/route.svg",
+  "background_url": "https://zevas1993.github.io/owlbear-waypoint-movement/index-v0.1.7.html",
+  "homepage_url": "https://github.com/Zevas1993/owlbear-waypoint-movement",
+  "author": "Zevas1993",
+  "action": {
+    "title": "Waypoint Diagnostics",
+    "icon": "https://zevas1993.github.io/owlbear-waypoint-movement/assets/route.svg",
+    "popover": "https://zevas1993.github.io/owlbear-waypoint-movement/diagnostics-v0.1.7.html",
+    "width": 360,
+    "height": 320
+  }
+}

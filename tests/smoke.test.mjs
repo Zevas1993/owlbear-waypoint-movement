@@ -21,12 +21,13 @@ globalThis.__WAYPOINT_TEST_SDK__={
       async activateMode(id,mode){events.push("activate");state.mode=mode;},
       onToolChange(){},onToolModeChange(){}
     },
+    scene:{items:{async getItems(){return [];}},onReadyChange(){}},
     notification:{async show(){}}
   },
   buildPath(){},buildLabel(){},Command:{MOVE:0,LINE:1}
 };
 
-await import("../src/extension-v0.1.6.mjs");
+await import("../src/extension-v0.1.7.mjs");
 
 async function ready(){
   for(let i=0;i<100;i++){if(actions.length===2)return;await new Promise(resolve=>setTimeout(resolve,5));}
@@ -56,11 +57,11 @@ test("manifest points to Pages hosted entry and diagnostic panel",()=>{
   const m=JSON.parse(fs.readFileSync(new URL("../manifest.json",import.meta.url),"utf8"));
   assert.match(m.background_url,/index-v0\.1\.6\.html$/);
   assert.match(m.action.popover,/diagnostics-v0\.1\.6\.html$/);
-  assert.equal(m.version,"0.1.6");
+  assert.equal(m.version,"0.1.7");
 });
 
 test("SDK is vendored locally so no CDN fetch is required",()=>{
-  const code=fs.readFileSync(new URL("../src/extension-v0.1.6.mjs",import.meta.url),"utf8");
+  const code=fs.readFileSync(new URL("../src/extension-v0.1.7.mjs",import.meta.url),"utf8");
   const sdk=fs.readFileSync(new URL("../vendor/owlbear-sdk-3.1.0.mjs",import.meta.url),"utf8");
   assert.match(code,/owlbear-sdk-3\.1\.0\.mjs/);
   assert.doesNotMatch(code,/https:\/\/esm/);
@@ -69,8 +70,18 @@ test("SDK is vendored locally so no CDN fetch is required",()=>{
 });
 
 test("native snap tool uses Owlbear grid and an immutable source module",()=>{
-  const code=fs.readFileSync(new URL("../src/extension-v0.1.6.mjs",import.meta.url),"utf8");
+  const code=fs.readFileSync(new URL("../src/extension-v0.1.7.mjs",import.meta.url),"utf8");
   assert.doesNotMatch(code,/snapSquare/);
   assert.match(code,/OBR\.scene\.grid\.snapPosition\(raw,undefined/);
   assert.match(code,/\.\/core-v0\.1\.6\.mjs/);
+});
+
+test("all players share the active path and tool switching is watched",()=>{
+  const code=fs.readFileSync(new URL("../src/extension-v0.1.7.mjs",import.meta.url),"utf8");
+  assert.match(code,/OBR\.scene\.items\.addItems\(/);
+  assert.match(code,/OBR\.scene\.items\.updateItems\(/);
+  assert.match(code,/OBR\.scene\.items\.deleteItems\(/);
+  assert.doesNotMatch(code,/OBR\.scene\.local\./);
+  assert.match(code,/OBR\.tool\.onToolChange\(/);
+  assert.match(code,/OBR\.tool\.getActiveTool\(/);
 });
