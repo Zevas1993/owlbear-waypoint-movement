@@ -26,6 +26,19 @@ This repository serves static files with no build step.
 
 Releasing a drag commits the position **without resetting the accumulated measurement**. Dragging a different token clears the previous session and starts a new one.
 
+## Shared movement tracking (v0.1.7)
+
+**Movement paths and distance labels are global, not private.** The extension stores them with `OBR.scene.items` so every player in the Owlbear scene can see the path being drawn and its cumulative distance in real time, whether or not they are using the movement tool themselves.
+
+- Each player's shared path is marked with their own Owlbear player ID; different players' paths do not interfere.
+- Releasing and regrabbing a token keeps the global line and running total visible to everyone.
+- **End Movement** deletes the path and label from the shared scene for all players.
+- Switching to another tool also ends and clears the shared movement automatically (normal Owlbear tool-change event, mode deactivation, and a fallback active-tool check).
+- When a player reconnects after a crash or reload, the extension removes abandoned paths owned by *that player*, not paths belonging to other players.
+- The route itself is not permanently saved after End Movement; the token's final location remains on the scene.
+
+The new `src/extension-v0.1.7.mjs` and `src/core-v0.1.7.mjs` preserve v0.1.6's native per-token snapping behavior. The earlier versioned files remain available for rollback.
+
 ## Native snapping (v0.1.6)
 
 **Movement snaps the same way as the selected Owlbear token was already placed.** On the first drag, the extension asks Owlbear for both the nearest cell center and grid intersection at the token's current position, then remembers the nearest alignment *separately on the X and Y axes* for the movement session.
@@ -45,13 +58,13 @@ The new modules `src/extension-v0.1.6.mjs` and `src/core-v0.1.6.mjs` are indepen
 ## Known limitations
 
 - Square grid only.
-- Paths are player-local overlays; token movement is synchronized.
+- Paths and labels are shared scene items visible to everyone, and token movement is synchronized. These shared updates may be subject to normal network latency.
 - Tracks the path you draw, not collision/pathfinding against fog walls or doors. Touch tracing reflects sampled positions and cannot recover corners the browser never reports.
 - Owlbear's SDK is self-hosted from the pinned `vendor/owlbear-sdk-3.1.0.mjs`; no third-party runtime CDN is required.
 - The custom desktop movement tool has been confirmed to load and draw a route in an Owlbear room. Native snap selection, token dragging, and cumulative waypoints have automated tests; in-room mobile behavior still needs manual confirmation.
 
 ## Developer notes
 
-Static HTML and ES modules; no npm or build required. `src/core-v0.1.6.mjs` contains route math and snap-lattice detection; `src/extension-v0.1.6.mjs` registers the Owlbear tool, modes, overlays and actions. Older versioned files are retained for rollback.
+Static HTML and ES modules; no npm or build required. `src/core-v0.1.7.mjs` contains route math and snap-lattice detection; `src/extension-v0.1.7.mjs` registers the tool, native snapping, shared global overlay and actions. Older versioned files are retained for rollback.
 
 [Owlbear extension documentation](https://docs.owlbear.rodeo/extensions/) · [GitHub Pages documentation](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)
