@@ -25,6 +25,8 @@ jobs:
           node --check src/core-v0.1.8.mjs
           node --check src/route-visual-v0.1.8.mjs
           node --check src/extension-v0.1.8.mjs
+          node --check src/core-v0.1.9.mjs
+          node --check src/extension-v0.1.9.mjs
           node --check vendor/owlbear-sdk-3.1.0.mjs
       - name: Verify toolbar and controls
         run: node --test tests/*.test.mjs

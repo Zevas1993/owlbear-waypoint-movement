@@ -1,0 +1,17 @@
+{
+  "name": "Waypoint Movement",
+  "version": "0.1.9",
+  "manifest_version": 1,
+  "description": "Waypoint-only movement: E anchors, mobile release/regrab, shared ruler in each player's Owlbear color and End Movement.",
+  "icon": "https://zevas1993.github.io/owlbear-waypoint-movement/assets/route.svg",
+  "background_url": "https://zevas1993.github.io/owlbear-waypoint-movement/index-v0.1.9.html",
+  "homepage_url": "https://github.com/Zevas1993/owlbear-waypoint-movement",
+  "author": "Zevas1993",
+  "action": {
+    "title": "Waypoint Diagnostics",
+    "icon": "https://zevas1993.github.io/owlbear-waypoint-movement/assets/route.svg",
+    "popover": "https://zevas1993.github.io/owlbear-waypoint-movement/diagnostics-v0.1.9.html",
+    "width": 360,
+    "height": 320
+  }
+}
